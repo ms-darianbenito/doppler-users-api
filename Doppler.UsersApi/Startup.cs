@@ -28,8 +28,6 @@ namespace Doppler.UsersApi
         {
             services.AddDopplerSecurity();
             services.AddControllers();
-            //services.AddSingleton<Weather.WeatherForecastService>();
-            //services.AddSingleton<Weather.DataService>();
             services.AddSwaggerGen(c =>
             {
                 c.AddSecurityDefinition("Bearer",
