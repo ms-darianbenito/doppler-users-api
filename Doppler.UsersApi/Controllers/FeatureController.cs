@@ -25,8 +25,6 @@ namespace Doppler.UsersApi.Controllers
         [HttpGet("/accounts/{accountname}/features")]
         public async Task<IActionResult> GetFeaturesForAccountByEmail(string accountEmail)
         {
-            //TODO: validate accountEmail parameter?
-
             var features = await _featuresRepository.GetFeaturesByUserAccount(accountEmail);
 
             if (features == null)
