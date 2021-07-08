@@ -1,11 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Doppler.UsersApi.DopplerSecurity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using Microsoft.Extensions.Logging;
+using Doppler.UsersApi.Infrastructure;
 
 namespace Doppler.UsersApi.Controllers
 {
@@ -13,25 +12,27 @@ namespace Doppler.UsersApi.Controllers
     [ApiController]
     public class FeatureController
     {
-        [AllowAnonymous]
-        [HttpGet("/features")]
-        public string GetFeatures()
-        {
-            return "This method will return a list of features";
-        }
+        private readonly ILogger _logger;
+        private readonly IFeaturesRepository _featuresRepository;
 
-        [Authorize(Policies.OWN_RESOURCE_OR_SUPERUSER)]
-        [HttpGet("accounts/{accountId:int:min(0)}/features")]
-        public string GetFeaturesForAccountById(int accountId)
+        public FeatureController(ILogger<FeatureController> logger, IFeaturesRepository featuresRepository)
         {
-            return $"Will return the list of features associated to the Account ID '{accountId}'";
+            _logger = logger;
+            _featuresRepository = featuresRepository;
         }
 
         [Authorize(Policies.OWN_RESOURCE_OR_SUPERUSER)]
         [HttpGet("/accounts/{accountname}/features")]
-        public string GetFeaturesForAccountByEmail(string accountEmail)
+        public async Task<IActionResult> GetFeaturesForAccountByEmail(string accountEmail)
         {
-            return $"Will return the list of features associated to the Account email '{accountEmail}'";
+            var features = await _featuresRepository.GetFeaturesByUserAccount(accountEmail);
+
+            if (features == null)
+            {
+                return new NotFoundResult();
+            }
+
+            return new OkObjectResult(features);
         }
     }
 }

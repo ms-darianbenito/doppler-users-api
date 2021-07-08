@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
 
-namespace Doppler.UsersApi
+namespace Doppler.UsersApi.Test
 {
     public class IntegrationTest
         : IClassFixture<WebApplicationFactory<Startup>>
@@ -20,6 +20,8 @@ namespace Doppler.UsersApi
         [InlineData("/swagger", HttpStatusCode.Moved, null)]
         [InlineData("/swagger/index.html", HttpStatusCode.OK, "text/html; charset=utf-8")]
         [InlineData("/swagger/v1/swagger.json", HttpStatusCode.OK, "application/json; charset=utf-8")]
+        [InlineData("/robots.txt", HttpStatusCode.OK, "text/plain")]
+        [InlineData("/favicon.ico", HttpStatusCode.OK, "image/x-icon")]
         [InlineData("/", HttpStatusCode.NotFound, null)]
         [InlineData("/Not/Found", HttpStatusCode.NotFound, null)]
         public async Task GET_endpoints_return_correct_status_and_contentType(string url, HttpStatusCode expectedStatusCode, string expectedContentType)
