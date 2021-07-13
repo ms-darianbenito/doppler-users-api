@@ -26,10 +26,5 @@ namespace Doppler.UsersApi.Infrastructure
             await cn.OpenAsync();
             return cn;
         }
-
-        Task<IDbConnection> IDatabaseConnectionFactory.GetConnection()
-        {
-            throw new NotImplementedException();
-        }
     }
 }
