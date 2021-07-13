@@ -22,10 +22,10 @@ namespace Doppler.UsersApi.Controllers
         }
 
         [Authorize(Policies.OWN_RESOURCE_OR_SUPERUSER)]
-        [HttpGet("/accounts/{accountname}/features")]
-        public async Task<IActionResult> GetFeaturesForAccountByEmail(string accountEmail)
+        [HttpGet("/accounts/{accountName}/features")]
+        public async Task<IActionResult> GetFeaturesForAccountByEmail(string accountName)
         {
-            var features = await _featuresRepository.GetFeaturesByUserAccount(accountEmail);
+            var features = await _featuresRepository.GetFeaturesByUserAccount(accountName);
 
             if (features == null)
             {

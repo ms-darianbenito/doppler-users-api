@@ -35,10 +35,10 @@ namespace Doppler.UsersApi.Test.Controllers
         }
 
         [Authorize(Policies.OWN_RESOURCE_OR_SUPERUSER)]
-        [HttpGet("/accounts/{accountname}/hello")]
-        public string GetForAccountByName(string accountname)
+        [HttpGet("/accounts/{accountName}/hello")]
+        public string GetForAccountByName(string accountName)
         {
-            return $"Hello! \"you\" that have access to the account with accountname '{accountname}'";
+            return $"Hello! \"you\" that have access to the account with accountName '{accountName}'";
         }
     }
 }

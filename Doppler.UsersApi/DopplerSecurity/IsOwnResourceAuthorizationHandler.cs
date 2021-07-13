@@ -43,7 +43,7 @@ namespace Doppler.UsersApi.DopplerSecurity
                 return true;
             }
 
-            if (routeData.Values.TryGetValue("accountname", out var accountname) && accountname?.ToString() == GetTokenUniqueName(context.User))
+            if (routeData.Values.TryGetValue("accountName", out var accountName) && accountName?.ToString() == GetTokenUniqueName(context.User))
             {
                 // TODO: In case of using different public keys, for example Doppler and Relay,
                 // it is necessary to check token Issuer information, to validate right origin.
