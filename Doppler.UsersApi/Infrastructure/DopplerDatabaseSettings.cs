@@ -21,10 +21,7 @@ namespace Doppler.UsersApi.Infrastructure
                 throw new ArgumentException("The string argument 'connectionString' cannot be empty.");
             }
 
-            var builder = new SqlConnectionStringBuilder(ConnectionString)
-            {
-                ApplicationName = Assembly.GetEntryAssembly().GetName().Name,
-            };
+            var builder = new SqlConnectionStringBuilder(ConnectionString);
 
             if (!string.IsNullOrWhiteSpace(Password))
             {

@@ -25,8 +25,8 @@ namespace Doppler.UsersApi.Infrastructure
                     LEFT JOIN UserFeatures UF ON U.IdUser = UF.IdUser
                     LEFT JOIN dbo.BillingCredits BC ON BC.IdBillingCredit = U.IdCurrentBillingCredit
                     LEFT JOIN dbo.UserTypesPlans UTP ON UTP.IdUserTypePlan = BC.IdUserTypePlan
-                    WHERE U.Email = @email",
-                    new { email });
+                    WHERE U.Email = @Email",
+                    new { Email = email });
                 return results.FirstOrDefault();
             }
         }
