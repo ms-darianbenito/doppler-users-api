@@ -20,10 +20,10 @@ namespace Doppler.UsersApi.Controllers
             _accountRepository = accountRepository;
         }
 
-        [HttpGet("/accounts/{email}/contactinformation")]
-        public async Task<IActionResult> GetContactInformation(string email)
+        [HttpGet("/accounts/{accountName}/contact-information")]
+        public async Task<IActionResult> GetContactInformation(string accountName)
         {
-            var contactInformation = await _accountRepository.GetContactInformation(email);
+            var contactInformation = await _accountRepository.GetContactInformation(accountName);
 
             if (contactInformation == null)
             {

@@ -18,9 +18,24 @@ namespace Doppler.UsersApi.Infrastructure
             using (IDbConnection connection = await _connectionFactory.GetConnection())
             {
                 var results = await connection.QueryAsync<ContactInformation>(@"
-                    SELECT  U.FirstName, U.LastName, U.Email, U.IdIndustry AS Industry, U.Company, U.PhoneNumber AS Phone, U.Address, U.ZipCode, CI.Name AS City, U.CityName, S.Name AS Province, CO.Code AS Country
-                    FROM    [User] U INNER JOIN [State] S ON U.IdState = S.IdState AND U.IdBillingState = S.IdState INNER JOIN City CI ON S.IdState = CI.IdState INNER JOIN [Country] CO ON S.IdCountry = CO.IdCountry
-                    WHERE   U.Email = @email",
+SELECT
+    U.FirstName,
+    U.LastName,
+    U.Email,
+    U.IdIndustry AS Industry,
+    U.Company, U.PhoneNumber AS Phone,
+    U.Address, U.ZipCode,
+    CI.Name AS City,
+    U.CityName,
+    S.Name AS Province,
+    CO.Code AS Country
+FROM
+    [User] U
+    INNER JOIN [State] S ON U.IdState = S.IdState AND U.IdBillingState = S.IdState
+    INNER JOIN City CI ON S.IdState = CI.IdState
+    INNER JOIN [Country] CO ON S.IdCountry = CO.IdCountry
+WHERE
+    U.Email = @email",
                     new { email });
                 return results.FirstOrDefault();
             }

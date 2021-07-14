@@ -40,7 +40,7 @@ namespace Doppler.UsersApi.Test
             var mockConnection = new Mock<DbConnection>();
 
             // TODO: validate input
-            mockConnection.SetupDapperAsync(c => c.QueryAsync<ContactInformation>(It.IsAny<string>(), It.IsAny<object>(), null, null, null)).ReturnsAsync(Enumerable.Empty<ContactInformation>());
+            mockConnection.SetupDapperAsync(c => c.QueryAsync<ContactInformation>(null, null, null, null, null)).ReturnsAsync(Enumerable.Empty<ContactInformation>());
 
             var client = _factory.WithWebHostBuilder(builder =>
             {
@@ -51,7 +51,7 @@ namespace Doppler.UsersApi.Test
 
             }).CreateClient(new WebApplicationFactoryClientOptions());
 
-            var request = new HttpRequestMessage(HttpMethod.Get, "accounts/test1@test.com/contactinformation")
+            var request = new HttpRequestMessage(HttpMethod.Get, "accounts/test1@test.com/contact-information")
             {
                 Headers = { { "Authorization", $"Bearer {TOKEN_ACCOUNT_123_TEST1_AT_TEST_DOT_COM_EXPIRE_20330518}" } }
             };
@@ -73,7 +73,7 @@ namespace Doppler.UsersApi.Test
             // Arrange
             var client = _factory.CreateClient(new WebApplicationFactoryClientOptions());
 
-            var request = new HttpRequestMessage(HttpMethod.Get, "accounts/test1@test.com/contactinformation")
+            var request = new HttpRequestMessage(HttpMethod.Get, "accounts/test1@test.com/contact-information")
             {
                 Headers = { { "Authorization", $"Bearer {token}" } }
             };
@@ -91,7 +91,7 @@ namespace Doppler.UsersApi.Test
             // Arrange
             var client = _factory.CreateClient(new WebApplicationFactoryClientOptions());
 
-            var request = new HttpRequestMessage(HttpMethod.Get, "accounts/test1@test.com/contactinformation");
+            var request = new HttpRequestMessage(HttpMethod.Get, "accounts/test1@test.com/contact-information");
 
             // Act
             var response = await client.SendAsync(request);
@@ -118,10 +118,12 @@ namespace Doppler.UsersApi.Test
                 Industry = "Industry Test",
             } };
 
+            var expectedContent = "{\"email\":\"test1@test.com\",\"firstname\":\"Test First Name\",\"lastname\":\"Test Last Name\",\"address\":\"Test Address\",\"city\":\"Test City\",\"province\":\"Test Province\",\"country\":\"Test Country\",\"zipCode\":\"Test ZipCode\",\"phone\":\"5555555\",\"company\":\"Test Company\",\"industry\":\"Industry Test\"}";
+
             var mockConnection = new Mock<DbConnection>();
 
             // TODO: validate input
-            mockConnection.SetupDapperAsync(c => c.QueryAsync<ContactInformation>(It.IsAny<string>(), It.IsAny<object>(), null, null, null)).ReturnsAsync(dbResponse);
+            mockConnection.SetupDapperAsync(c => c.QueryAsync<ContactInformation>(null, null, null, null, null)).ReturnsAsync(dbResponse);
 
             var client = _factory.WithWebHostBuilder(builder =>
             {
@@ -132,7 +134,7 @@ namespace Doppler.UsersApi.Test
 
             }).CreateClient(new WebApplicationFactoryClientOptions());
 
-            var request = new HttpRequestMessage(HttpMethod.Get, "accounts/test1@test.com/contactinformation")
+            var request = new HttpRequestMessage(HttpMethod.Get, "accounts/test1@test.com/contact-information")
             {
                 Headers = { { "Authorization", $"Bearer {TOKEN_ACCOUNT_123_TEST1_AT_TEST_DOT_COM_EXPIRE_20330518}" } }
             };
@@ -140,12 +142,7 @@ namespace Doppler.UsersApi.Test
             // Act
             var response = await client.SendAsync(request);
             var responseContent = await response.Content.ReadAsStringAsync();
-            var setting = new JsonSerializerSettings
-            {
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
-            };
-
-            var expectedContent = JsonConvert.SerializeObject(dbResponse.FirstOrDefault(), setting);
+            _output.WriteLine(responseContent);
 
             // Assert
             Assert.Equal(expectedContent, responseContent);
