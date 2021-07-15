@@ -25,14 +25,12 @@ SELECT
     U.IdIndustry AS Industry,
     U.Company, U.PhoneNumber AS Phone,
     U.Address, U.ZipCode,
-    CI.Name AS City,
-    U.CityName,
+    U.CityName AS City,
     S.Name AS Province,
     CO.Code AS Country
 FROM
     [User] U
-    INNER JOIN [State] S ON U.IdState = S.IdState AND U.IdBillingState = S.IdState
-    INNER JOIN City CI ON S.IdState = CI.IdState
+    INNER JOIN [State] S ON U.IdState = S.IdState
     INNER JOIN [Country] CO ON S.IdCountry = CO.IdCountry
 WHERE
     U.Email = @email",
