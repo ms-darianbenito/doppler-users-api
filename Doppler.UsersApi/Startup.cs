@@ -25,6 +25,7 @@ namespace Doppler.UsersApi
             services.AddDopplerSecurity();
             services.AddRepositories();
             services.AddControllers();
+            services.AddCors();
             services.AddSwaggerGen(c =>
             {
                 c.AddSecurityDefinition("Bearer",
@@ -71,6 +72,12 @@ namespace Doppler.UsersApi
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseCors(policy => policy
+                .SetIsOriginAllowed(isOriginAllowed: _ => true)
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials());
 
             app.UseAuthorization();
 
