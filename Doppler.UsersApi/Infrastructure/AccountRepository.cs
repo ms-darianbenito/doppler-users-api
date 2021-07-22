@@ -22,7 +22,7 @@ SELECT
     U.FirstName,
     U.LastName,
     U.Email,
-    U.IdIndustry AS Industry,
+    I.Code AS Industry,
     U.Company, U.PhoneNumber AS Phone,
     U.Address, U.ZipCode,
     U.CityName AS City,
@@ -32,6 +32,7 @@ FROM
     [User] U
     INNER JOIN [State] S ON U.IdState = S.IdState
     INNER JOIN [Country] CO ON S.IdCountry = CO.IdCountry
+    INNER JOIN [Industry] I ON I.IdIndustry = U.IdIndustry
 WHERE
     U.Email = @email",
                     new { email });
