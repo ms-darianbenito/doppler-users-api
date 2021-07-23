@@ -22,17 +22,17 @@ SELECT
     U.FirstName,
     U.LastName,
     U.Email,
-    I.Code AS Industry,
+    isnull(I.Code, '') AS Industry,
     U.Company, U.PhoneNumber AS Phone,
     U.Address, U.ZipCode,
     U.CityName AS City,
-    S.Name AS Province,
-    CO.Code AS Country
+    isnull(S.Name, '') AS Province,
+    isnull(CO.Code, '') AS Country
 FROM
     [User] U
-    INNER JOIN [State] S ON U.IdState = S.IdState
-    INNER JOIN [Country] CO ON S.IdCountry = CO.IdCountry
-    INNER JOIN [Industry] I ON I.IdIndustry = U.IdIndustry
+    LEFT JOIN [State] S ON U.IdState = S.IdState
+    LEFT JOIN [Country] CO ON S.IdCountry = CO.IdCountry
+    LEFT JOIN [Industry] I ON I.IdIndustry = U.IdIndustry
 WHERE
     U.Email = @email",
                     new { email });
