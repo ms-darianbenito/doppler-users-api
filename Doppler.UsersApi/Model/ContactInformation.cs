@@ -12,7 +12,6 @@ namespace Doppler.UsersApi.Model
         public string ZipCode { get; set; }
         public string Phone { get; set; }
         public string Company { get; set; }
-        // TODO: check this when industry data source is defined
         public string Industry { get; set; }
     }
 }

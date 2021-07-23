@@ -39,5 +39,63 @@ WHERE
                 return results.FirstOrDefault();
             }
         }
+
+        public async Task UpdateContactInformation(string accountName, ContactInformation contactInformation)
+        {
+            using (IDbConnection connection = await _connectionFactory.GetConnection())
+            {
+                //Get Industry Id
+                var industry = await connection.QueryAsync<string>(@"
+SELECT
+    IdIndustry
+FROM
+    [Industry]
+WHERE
+    Code = @industrycode",
+                    new { @industrycode = contactInformation.Industry });
+                //Get State Id
+                //TODO add this condition when column Code is adds to State: StateCode = @province
+                var state = await connection.QueryAsync<string>(@"
+SELECT
+    IdState
+FROM
+    [State]
+WHERE
+    --StateCode = @province AND
+    CountryCode = @country",
+                    new
+                    {
+                        @province = contactInformation.Province,
+                        @country = contactInformation.Country
+                    });
+                //Update User
+                await connection.QueryAsync(@"
+UPDATE [User] SET
+    FirstName = @firstname,
+    LastName = @lastname,
+    Email = @email,
+    IdIndustry = @industry,
+    Company = @company,
+    PhoneNumber = @phonenumber,
+    Address = @address,
+    ZipCode = @zipcode,
+    CityName = @cityname
+WHERE
+    Email = @email;",
+                new
+                {
+                    @firstname = contactInformation.Firstname,
+                    @lastname = contactInformation.Lastname,
+                    @email = contactInformation.Email,
+                    @industry = industry.FirstOrDefault(),
+                    @company = contactInformation.Company,
+                    @phonenumber = contactInformation.Phone,
+                    @address = contactInformation.Address,
+                    @zipcode = contactInformation.ZipCode,
+                    @cityname = contactInformation.City
+                    //TODO add this set when column Code is adds to State: IdState = @state y @state = state.FirstOrDefault()
+                });
+            }
+        }
     }
 }
