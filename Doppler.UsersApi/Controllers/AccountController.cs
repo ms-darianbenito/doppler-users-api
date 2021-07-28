@@ -1,5 +1,6 @@
 using Doppler.UsersApi.DopplerSecurity;
 using Doppler.UsersApi.Infrastructure;
+using Doppler.UsersApi.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -31,6 +32,16 @@ namespace Doppler.UsersApi.Controllers
             }
 
             return new OkObjectResult(contactInformation);
+        }
+
+        [HttpPut("/accounts/{accountName}/contact-information")]
+        public async Task<IActionResult> UpdateContactInformation(string accountName, [FromBody] ContactInformation contactInformation)
+        {
+            _logger.LogDebug("Updating Contact Information.");
+
+            await _accountRepository.UpdateContactInformation(accountName, contactInformation);
+
+            return new OkObjectResult("Successfully");
         }
     }
 }

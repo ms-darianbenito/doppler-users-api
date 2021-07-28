@@ -39,5 +39,39 @@ WHERE
                 return results.FirstOrDefault();
             }
         }
+
+        public async Task UpdateContactInformation(string accountName, ContactInformation contactInformation)
+        {
+            using (IDbConnection connection = await _connectionFactory.GetConnection())
+            {
+                //Update User
+                var rowsAffected = await connection.ExecuteAsync(@"
+UPDATE [User] SET
+    FirstName = @firstname,
+    LastName = @lastname,
+    IdIndustry = (SELECT IdIndustry FROM [Industry] WHERE Code = @industrycode),
+    Company = @company,
+    PhoneNumber = @phonenumber,
+    Address = @address,
+    ZipCode = @zipcode,
+    CityName = @cityname
+    -- IdState = (SELECT IdState FROM [State] WHERE StateCode = @province AND CountryCode = @country)
+WHERE
+    Email = @email;",
+                new
+                {
+                    @firstname = contactInformation.Firstname,
+                    @lastname = contactInformation.Lastname,
+                    industrycode = contactInformation.Industry,
+                    @company = contactInformation.Company,
+                    @phonenumber = contactInformation.Phone,
+                    @address = contactInformation.Address,
+                    @zipcode = contactInformation.ZipCode,
+                    @cityname = contactInformation.City,
+                    //TODO add this set when column Code is adds to State: @province = contactInformation.Province, @country = contactInformation.Country
+                    @email = accountName
+                });
+            }
+        }
     }
 }
