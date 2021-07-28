@@ -44,54 +44,31 @@ WHERE
         {
             using (IDbConnection connection = await _connectionFactory.GetConnection())
             {
-                //Get Industry Id
-                var industry = await connection.QueryAsync<string>(@"
-SELECT
-    IdIndustry
-FROM
-    [Industry]
-WHERE
-    Code = @industrycode",
-                    new { @industrycode = contactInformation.Industry });
-                //Get State Id
-                //TODO add this condition when column Code is adds to State: StateCode = @province
-                var state = await connection.QueryAsync<string>(@"
-SELECT
-    IdState
-FROM
-    [State]
-WHERE
-    --StateCode = @province AND
-    CountryCode = @country",
-                    new
-                    {
-                        @province = contactInformation.Province,
-                        @country = contactInformation.Country
-                    });
                 //Update User
-                await connection.QueryAsync(@"
+                var rowsAffected = await connection.ExecuteAsync(@"
 UPDATE [User] SET
     FirstName = @firstname,
     LastName = @lastname,
-    IdIndustry = @industry,
+    IdIndustry = (SELECT IdIndustry FROM [Industry] WHERE Code = @industrycode),
     Company = @company,
     PhoneNumber = @phonenumber,
     Address = @address,
     ZipCode = @zipcode,
     CityName = @cityname
+    -- IdState = (SELECT IdState FROM [State] WHERE StateCode = @province AND CountryCode = @country)
 WHERE
     Email = @email;",
                 new
                 {
                     @firstname = contactInformation.Firstname,
                     @lastname = contactInformation.Lastname,
-                    @industry = industry.FirstOrDefault(),
+                    industrycode = contactInformation.Industry,
                     @company = contactInformation.Company,
                     @phonenumber = contactInformation.Phone,
                     @address = contactInformation.Address,
                     @zipcode = contactInformation.ZipCode,
                     @cityname = contactInformation.City,
-                    //TODO add this set when column Code is adds to State: IdState = @state y @state = state.FirstOrDefault()
+                    //TODO add this set when column Code is adds to State: @province = contactInformation.Province, @country = contactInformation.Country
                     @email = accountName
                 });
             }
