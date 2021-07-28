@@ -73,7 +73,6 @@ WHERE
 UPDATE [User] SET
     FirstName = @firstname,
     LastName = @lastname,
-    Email = @email,
     IdIndustry = @industry,
     Company = @company,
     PhoneNumber = @phonenumber,
@@ -86,14 +85,14 @@ WHERE
                 {
                     @firstname = contactInformation.Firstname,
                     @lastname = contactInformation.Lastname,
-                    @email = contactInformation.Email,
                     @industry = industry.FirstOrDefault(),
                     @company = contactInformation.Company,
                     @phonenumber = contactInformation.Phone,
                     @address = contactInformation.Address,
                     @zipcode = contactInformation.ZipCode,
-                    @cityname = contactInformation.City
+                    @cityname = contactInformation.City,
                     //TODO add this set when column Code is adds to State: IdState = @state y @state = state.FirstOrDefault()
+                    @email = accountName
                 });
             }
         }

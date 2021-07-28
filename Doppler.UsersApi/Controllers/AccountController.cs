@@ -34,7 +34,7 @@ namespace Doppler.UsersApi.Controllers
             return new OkObjectResult(contactInformation);
         }
 
-        [HttpPost("/accounts/{accountName}/contact-information")]
+        [HttpPut("/accounts/{accountName}/contact-information")]
         public async Task<IActionResult> UpdateContactInformation(string accountName, [FromBody] ContactInformation contactInformation)
         {
             _logger.LogDebug("Updating Contact Information.");
