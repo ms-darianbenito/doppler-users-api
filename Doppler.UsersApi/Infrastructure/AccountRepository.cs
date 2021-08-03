@@ -26,7 +26,7 @@ SELECT
     U.Company, U.PhoneNumber AS Phone,
     U.Address, U.ZipCode,
     U.CityName AS City,
-    isnull(S.Name, '') AS Province,
+    isnull(S.StateCode, '') AS Province,
     isnull(CO.Code, '') AS Country
 FROM
     [User] U
