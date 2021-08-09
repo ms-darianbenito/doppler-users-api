@@ -103,13 +103,13 @@ namespace Doppler.UsersApi.Test
 
 
         [Theory]
-        [InlineData(true, "{\"contactPolicies\":true}")]
-        [InlineData(false, "{\"contactPolicies\":false}")]
-        public async Task GET_features_should_return_right_value_based_on_db_response(bool contactPoliciesValue, string expectedResponse)
+        [InlineData(true, "{\"contactPolicies\":true,\"bigQuery\":true,\"smartCampaigns\":true,\"smartCampaingsExtraCustomizations\":true,\"smartSubjectCampaigns\":true}")]
+        [InlineData(false, "{\"contactPolicies\":false,\"bigQuery\":false,\"smartCampaigns\":false,\"smartCampaingsExtraCustomizations\":false,\"smartSubjectCampaigns\":false}")]
+        public async Task GET_features_should_return_right_value_based_on_db_response(bool responseValue, string expectedResponse)
         {
             // Arrange
 
-            var dbResponse = new[] { new Features { ContactPolicies = contactPoliciesValue } };
+            var dbResponse = new[] { new Features { ContactPolicies = responseValue, BigQuery = responseValue, SmartCampaigns = responseValue, SmartCampaingsExtraCustomizations = responseValue, SmartSubjectCampaigns = responseValue } };
 
             var mockConnection = new Mock<DbConnection>();
 
