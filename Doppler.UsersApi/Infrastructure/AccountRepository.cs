@@ -54,21 +54,22 @@ UPDATE [User] SET
     PhoneNumber = @phonenumber,
     Address = @address,
     ZipCode = @zipcode,
-    CityName = @cityname
-    -- IdState = (SELECT IdState FROM [State] WHERE StateCode = @province AND CountryCode = @country)
+    CityName = @cityname,
+    IdState = ISNULL((SELECT IdState FROM [State] WHERE StateCode = @province AND CountryCode = @country), (SELECT IdState FROM [State] WHERE StateCode = 'NO-DEF' AND CountryCode = @country))
 WHERE
     Email = @email;",
                 new
                 {
                     @firstname = contactInformation.Firstname,
                     @lastname = contactInformation.Lastname,
-                    industrycode = contactInformation.Industry,
+                    @industrycode = contactInformation.Industry,
                     @company = contactInformation.Company,
                     @phonenumber = contactInformation.Phone,
                     @address = contactInformation.Address,
                     @zipcode = contactInformation.ZipCode,
                     @cityname = contactInformation.City,
-                    //TODO add this set when column Code is adds to State: @province = contactInformation.Province, @country = contactInformation.Country
+                    @province = contactInformation.Province,
+                    @country = contactInformation.Country,
                     @email = accountName
                 });
             }
