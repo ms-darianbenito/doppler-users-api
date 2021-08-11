@@ -84,6 +84,8 @@ namespace Doppler.UsersApi.Test
                 ZipCode = "Test ZipCode",
                 Country = "Test Country",
                 Industry = "Industry Test",
+                AnswerSecurityQuestion = "test",
+                IdSecurityQuestion = "1"
             };
 
             var requestContent = new StringContent(JsonConvert.SerializeObject(contactInformation), Encoding.UTF8, "application/json");

@@ -53,6 +53,7 @@ WHERE
         {
             using (IDbConnection connection = await _connectionFactory.GetConnection())
             {
+                var encryptedAnswer = contactInformation.AnswerSecurityQuestion == null ? contactInformation.AnswerSecurityQuestion : _encryptionService.EncryptAES256(contactInformation.AnswerSecurityQuestion.ToUpper());
                 //Update User
                 var rowsAffected = await connection.ExecuteAsync(@"
 UPDATE [User] SET
@@ -64,7 +65,9 @@ UPDATE [User] SET
     Address = @address,
     ZipCode = @zipcode,
     CityName = @cityname,
-    IdState = ISNULL((SELECT IdState FROM [State] WHERE StateCode = @province AND CountryCode = @country), (SELECT IdState FROM [State] WHERE StateCode = 'NO-DEF' AND CountryCode = @country))
+    IdState = ISNULL((SELECT IdState FROM [State] WHERE StateCode = @province AND CountryCode = @country), (SELECT IdState FROM [State] WHERE StateCode = 'NO-DEF' AND CountryCode = @country)),
+    IdSecurityQuestion = @idsecurityquestion,
+    AnswerSecurityQuestion = @encryptedanswer
 WHERE
     Email = @email;",
                 new
@@ -79,6 +82,8 @@ WHERE
                     @cityname = contactInformation.City,
                     @province = contactInformation.Province,
                     @country = contactInformation.Country,
+                    @idsecurityquestion = contactInformation.IdSecurityQuestion,
+                    @encryptedanswer = encryptedAnswer,
                     @email = accountName
                 });
             }
