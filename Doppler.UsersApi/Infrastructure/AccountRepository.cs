@@ -3,21 +3,23 @@ using Doppler.UsersApi.Model;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Doppler.UsersApi.Services;
 
 namespace Doppler.UsersApi.Infrastructure
 {
     public class AccountRepository : IAccountRepository
     {
         private readonly IDatabaseConnectionFactory _connectionFactory;
-        public AccountRepository(IDatabaseConnectionFactory connectionFactory)
+        private readonly IEncryptionService _encryptionService;
+        public AccountRepository(IDatabaseConnectionFactory connectionFactory, IEncryptionService encryptionService)
         {
             _connectionFactory = connectionFactory;
+            _encryptionService = encryptionService;
         }
         public async Task<ContactInformation> GetContactInformation(string email)
         {
-            using (IDbConnection connection = await _connectionFactory.GetConnection())
-            {
-                var results = await connection.QueryAsync<ContactInformation>(@"
+            using var connection = await _connectionFactory.GetConnection();
+            var result = await connection.QueryFirstOrDefaultAsync<ContactInformation>(@"
 SELECT
     U.FirstName,
     U.LastName,
@@ -27,7 +29,9 @@ SELECT
     U.Address, U.ZipCode,
     U.CityName AS City,
     isnull(S.StateCode, '') AS Province,
-    isnull(CO.Code, '') AS Country
+    isnull(CO.Code, '') AS Country,
+    U.[AnswerSecurityQuestion],
+    U.[IdSecurityQuestion]
 FROM
     [User] U
     LEFT JOIN [State] S ON U.IdState = S.IdState
@@ -35,9 +39,14 @@ FROM
     LEFT JOIN [Industry] I ON I.IdIndustry = U.IdIndustry
 WHERE
     U.Email = @email",
-                    new { email });
-                return results.FirstOrDefault();
+                new { email });
+
+            if (result != null)
+            {
+                result.AnswerSecurityQuestion = _encryptionService.DecryptAES256(result.AnswerSecurityQuestion);
             }
+
+            return result;
         }
 
         public async Task UpdateContactInformation(string accountName, ContactInformation contactInformation)

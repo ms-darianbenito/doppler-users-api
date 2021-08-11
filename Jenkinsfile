@@ -28,7 +28,12 @@ pipeline {
         }
         stage('Test') {
             steps {
-                sh 'docker build --target test .'
+                sh '''docker build \
+                --build-arg EncryptionSettings__InitVectorAsAsciiString="$EncryptionSettings__InitVectorAsAsciiString" \
+                --build-arg EncryptionSettings__SaltValueAsAsciiString="$EncryptionSettings__SaltValueAsAsciiString" \
+                --build-arg EncryptionSettings__Password="$EncryptionSettings__Password" \
+                --target test \
+                .'''
             }
         }
         stage('Publish in dopplerdock') {

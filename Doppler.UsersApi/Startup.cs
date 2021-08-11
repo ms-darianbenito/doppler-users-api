@@ -1,5 +1,7 @@
 using System;
+using Doppler.UsersApi.Encryption;
 using Doppler.UsersApi.Infrastructure;
+using Doppler.UsersApi.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -54,8 +56,11 @@ namespace Doppler.UsersApi
                 if (!string.IsNullOrEmpty(baseUrl))
                 {
                     c.AddServer(new OpenApiServer() { Url = baseUrl });
-                };
+                }
             });
+
+            services.Configure<EncryptionSettings>(Configuration.GetSection(nameof(EncryptionSettings)));
+            services.AddScoped<IEncryptionService, EncryptionService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

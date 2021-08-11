@@ -26,6 +26,12 @@ RUN dotnet dotnet-format --check
 RUN dotnet build -c Release
 
 FROM build AS test
+ARG EncryptionSettings__InitVectorAsAsciiString
+ENV EncryptionSettings__InitVectorAsAsciiString=$EncryptionSettings__InitVectorAsAsciiString
+ARG EncryptionSettings__SaltValueAsAsciiString
+ENV EncryptionSettings__SaltValueAsAsciiString=$EncryptionSettings__SaltValueAsAsciiString
+ARG EncryptionSettings__Password
+ENV EncryptionSettings__Password=$EncryptionSettings__Password
 RUN dotnet test
 
 FROM build AS publish

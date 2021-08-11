@@ -13,5 +13,7 @@ namespace Doppler.UsersApi.Model
         public string Phone { get; set; }
         public string Company { get; set; }
         public string Industry { get; set; }
+        public string AnswerSecurityQuestion { get; set; }
+        public string IdSecurityQuestion { get; set; }
     }
 }

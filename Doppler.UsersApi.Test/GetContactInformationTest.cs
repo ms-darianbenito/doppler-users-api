@@ -5,14 +5,13 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Moq;
 using Moq.Dapper;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System.Data.Common;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
+using Doppler.UsersApi.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -104,7 +103,8 @@ namespace Doppler.UsersApi.Test
         public async Task GET_contact_information_should_return_right_value_based_on_db_response()
         {
             // Arrange
-            var dbResponse = new[] { new ContactInformation {
+            var dbResponse = new ContactInformation
+            {
                 Firstname = "Test First Name",
                 Lastname = "Test Last Name",
                 Email = "test1@test.com",
@@ -116,20 +116,27 @@ namespace Doppler.UsersApi.Test
                 ZipCode = "Test ZipCode",
                 Country = "Test Country",
                 Industry = "Industry Test",
-            } };
+                AnswerSecurityQuestion = "test",
+                IdSecurityQuestion = "1"
+            };
 
-            var expectedContent = "{\"email\":\"test1@test.com\",\"firstname\":\"Test First Name\",\"lastname\":\"Test Last Name\",\"address\":\"Test Address\",\"city\":\"Test City\",\"province\":\"Test Province\",\"country\":\"Test Country\",\"zipCode\":\"Test ZipCode\",\"phone\":\"5555555\",\"company\":\"Test Company\",\"industry\":\"Industry Test\"}";
+            const string expectedContent = "{\"email\":\"test1@test.com\",\"firstname\":\"Test First Name\",\"lastname\":\"Test Last Name\",\"address\":\"Test Address\",\"city\":\"Test City\",\"province\":\"Test Province\",\"country\":\"Test Country\",\"zipCode\":\"Test ZipCode\",\"phone\":\"5555555\",\"company\":\"Test Company\",\"industry\":\"Industry Test\",\"answerSecurityQuestion\":\"TEST\",\"idSecurityQuestion\":\"1\"}";
 
             var mockConnection = new Mock<DbConnection>();
 
             // TODO: validate input
-            mockConnection.SetupDapperAsync(c => c.QueryAsync<ContactInformation>(null, null, null, null, null)).ReturnsAsync(dbResponse);
+            mockConnection.SetupDapperAsync(c => c.QueryFirstOrDefaultAsync<ContactInformation>(null, null, null, null, null))
+                .ReturnsAsync(dbResponse);
+
+            var encryptedMock = new Mock<IEncryptionService>();
+            encryptedMock.Setup(x => x.DecryptAES256(It.IsAny<string>())).Returns("TEST");
 
             var client = _factory.WithWebHostBuilder(builder =>
             {
                 builder.ConfigureTestServices(services =>
                 {
                     services.SetupConnectionFactory(mockConnection.Object);
+                    services.AddSingleton(encryptedMock.Object);
                 });
 
             }).CreateClient(new WebApplicationFactoryClientOptions());
