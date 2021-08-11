@@ -53,7 +53,7 @@ WHERE
         {
             using (IDbConnection connection = await _connectionFactory.GetConnection())
             {
-                var encryptedAnswer = _encryptionService.EncryptAES256(contactInformation.AnswerSecurityQuestion.ToUpper());
+                var encryptedAnswer = contactInformation.AnswerSecurityQuestion == null ? contactInformation.AnswerSecurityQuestion : _encryptionService.EncryptAES256(contactInformation.AnswerSecurityQuestion.ToUpper());
                 //Update User
                 var rowsAffected = await connection.ExecuteAsync(@"
 UPDATE [User] SET
