@@ -1,7 +1,9 @@
 using System;
 using Doppler.UsersApi.Encryption;
 using Doppler.UsersApi.Infrastructure;
-using Doppler.UsersApi.Services;
+using Doppler.UsersApi.Model;
+using Doppler.UsersApi.Validators;
+using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -61,6 +63,7 @@ namespace Doppler.UsersApi
 
             services.Configure<EncryptionSettings>(Configuration.GetSection(nameof(EncryptionSettings)));
             services.AddScoped<IEncryptionService, EncryptionService>();
+            services.AddScoped<IValidator<ContactInformation>, ContactInformationValidator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

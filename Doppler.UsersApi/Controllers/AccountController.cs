@@ -1,6 +1,6 @@
-using Doppler.UsersApi.DopplerSecurity;
 using Doppler.UsersApi.Infrastructure;
 using Doppler.UsersApi.Model;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -14,11 +14,16 @@ namespace Doppler.UsersApi.Controllers
     {
         private readonly ILogger _logger;
         private readonly IAccountRepository _accountRepository;
+        private readonly IValidator<ContactInformation> _validator;
 
-        public AccountController(ILogger<FeatureController> logger, IAccountRepository accountRepository)
+        public AccountController(
+            ILogger<FeatureController> logger,
+            IAccountRepository accountRepository,
+            IValidator<ContactInformation> validator)
         {
             _logger = logger;
             _accountRepository = accountRepository;
+            _validator = validator;
         }
 
         [HttpGet("/accounts/{accountName}/contact-information")]
@@ -38,6 +43,12 @@ namespace Doppler.UsersApi.Controllers
         public async Task<IActionResult> UpdateContactInformation(string accountName, [FromBody] ContactInformation contactInformation)
         {
             _logger.LogDebug("Updating Contact Information.");
+
+            var results = await _validator.ValidateAsync(contactInformation);
+            if (!results.IsValid)
+            {
+                return new BadRequestObjectResult(results.ToString("-"));
+            }
 
             await _accountRepository.UpdateContactInformation(accountName, contactInformation);
 

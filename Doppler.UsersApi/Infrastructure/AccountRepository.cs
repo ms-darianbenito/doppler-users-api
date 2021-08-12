@@ -1,9 +1,7 @@
 using Dapper;
 using Doppler.UsersApi.Model;
-using System.Data;
-using System.Linq;
 using System.Threading.Tasks;
-using Doppler.UsersApi.Services;
+using Doppler.UsersApi.Encryption;
 
 namespace Doppler.UsersApi.Infrastructure
 {
@@ -51,11 +49,9 @@ WHERE
 
         public async Task UpdateContactInformation(string accountName, ContactInformation contactInformation)
         {
-            using (IDbConnection connection = await _connectionFactory.GetConnection())
-            {
-                var encryptedAnswer = contactInformation.AnswerSecurityQuestion == null ? contactInformation.AnswerSecurityQuestion : _encryptionService.EncryptAES256(contactInformation.AnswerSecurityQuestion.ToUpper());
-                //Update User
-                var rowsAffected = await connection.ExecuteAsync(@"
+            using var connection = await _connectionFactory.GetConnection();
+            //Update User
+            await connection.ExecuteAsync(@"
 UPDATE [User] SET
     FirstName = @firstname,
     LastName = @lastname,
@@ -83,10 +79,9 @@ WHERE
                     @province = contactInformation.Province,
                     @country = contactInformation.Country,
                     @idsecurityquestion = contactInformation.IdSecurityQuestion,
-                    @encryptedanswer = encryptedAnswer,
+                    @encryptedanswer = _encryptionService.EncryptAES256(contactInformation.AnswerSecurityQuestion.ToUpper()),
                     @email = accountName
                 });
-            }
         }
     }
 }

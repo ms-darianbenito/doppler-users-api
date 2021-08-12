@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using Doppler.UsersApi.Services;
 using Microsoft.Extensions.Options;
 
 namespace Doppler.UsersApi.Encryption
