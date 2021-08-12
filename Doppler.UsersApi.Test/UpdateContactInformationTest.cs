@@ -81,7 +81,7 @@ namespace Doppler.UsersApi.Test
                 Address = "Test Address",
                 City = "Test City",
                 Province = "Test ProvinceAh pe",
-                ZipCode = "Test ZipCode",
+                ZipCode = "Test Zip",
                 Country = "Test Country",
                 Industry = "Industry Test",
                 AnswerSecurityQuestion = "test",

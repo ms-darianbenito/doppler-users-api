@@ -1,4 +1,4 @@
-namespace Doppler.UsersApi.Services
+namespace Doppler.UsersApi.Encryption
 {
     public interface IEncryptionService
     {
