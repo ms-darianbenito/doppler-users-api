@@ -162,28 +162,29 @@ namespace Doppler.UsersApi.Test
             Assert.True(_validator.Validate(contactInformation).IsValid);
         }
 
-        [InlineData(null)]
-        [InlineData(" ")]
-        [InlineData("")]
-        [Theory]
-        public void Validate_contact_information_should_return_an_error_when_AnswerSecurityQuestion_is_empty(string answer)
-        {
-            var contactInformation = new ContactInformation
-            {
-                Firstname = "firstname",
-                Lastname = "lastname",
-                Address = "address",
-                City = "city",
-                Country = "country",
-                Phone = "23123",
-                Province = "New York",
-                ZipCode = "7600",
-                IdSecurityQuestion = "1",
-                AnswerSecurityQuestion = answer
-            };
+        // TODO: When task DAT-525 is deployed in prod, we need to add the next validator
+        //[InlineData(null)]
+        //[InlineData(" ")]
+        //[InlineData("")]
+        //[Theory]
+        //public void Validate_contact_information_should_return_an_error_when_AnswerSecurityQuestion_is_empty(string answer)
+        //{
+        //    var contactInformation = new ContactInformation
+        //    {
+        //        Firstname = "firstname",
+        //        Lastname = "lastname",
+        //        Address = "address",
+        //        City = "city",
+        //        Country = "country",
+        //        Phone = "23123",
+        //        Province = "New York",
+        //        ZipCode = "7600",
+        //        IdSecurityQuestion = "1",
+        //        AnswerSecurityQuestion = answer
+        //    };
 
-            Assert.False(_validator.Validate(contactInformation).IsValid);
-        }
+        //    Assert.False(_validator.Validate(contactInformation).IsValid);
+        //}
 
         [Fact]
         public void Validate_contact_information_should_return_is_valid_when_data_are_correctly()
