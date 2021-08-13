@@ -79,7 +79,7 @@ WHERE
                     @province = contactInformation.Province,
                     @country = contactInformation.Country,
                     @idsecurityquestion = contactInformation.IdSecurityQuestion,
-                    @encryptedanswer = _encryptionService.EncryptAES256(contactInformation.AnswerSecurityQuestion.ToUpper()),
+                    @encryptedanswer = contactInformation.AnswerSecurityQuestion == null ? "" : _encryptionService.EncryptAES256(contactInformation.AnswerSecurityQuestion.ToUpper()),
                     @email = accountName
                 });
         }
