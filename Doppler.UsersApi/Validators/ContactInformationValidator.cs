@@ -38,11 +38,6 @@ namespace Doppler.UsersApi.Validators
                 .NotEmpty()
                 .MaximumLength(25);
 
-            // TODO: When task DAT-525 is deployed in prod, we need to add the next validator
-            //RuleFor(x => x.AnswerSecurityQuestion)
-            //    .NotEmpty()
-            //    .MaximumLength(100);
-
             RuleFor(x => x.Company)
                 .MaximumLength(50);
         }
