@@ -27,7 +27,7 @@ namespace Doppler.UsersApi.Infrastructure
                             ISNULL(uf.[SmartSubjectCampaignsEnabled], ISNULL(utp.[SmartSubjectCampaignsEnabled], 0)) AS SmartSubjectCampaigns,
                             ISNULL(uf.[EmailParameterEnabled], ISNULL(utp.[EmailParameterEnabled], 0)) AS EmailParameter,
                             ISNULL(uf.[SiteTrackingLicensed], ISNULL(utp.[SiteTrackingLicensed], 0)) AS SiteTracking,
-                            ISNULL(uf.[BmwCrmIntegrationEnabled], 0) AS BmwCrmIntegration,
+                            ISNULL(uf.[BmwCrmIntegrationEnabled], 0) AS BmwCrmIntegration
                     FROM dbo.[User] U
                     LEFT JOIN UserFeatures UF ON U.IdUser = UF.IdUser
                     LEFT JOIN dbo.BillingCredits BC ON BC.IdBillingCredit = U.IdCurrentBillingCredit
