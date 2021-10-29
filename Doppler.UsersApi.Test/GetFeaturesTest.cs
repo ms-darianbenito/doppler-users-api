@@ -103,13 +103,24 @@ namespace Doppler.UsersApi.Test
 
 
         [Theory]
-        [InlineData(true, "{\"contactPolicies\":true,\"bigQuery\":true,\"smartCampaigns\":true,\"smartCampaingsExtraCustomizations\":true,\"smartSubjectCampaigns\":true}")]
-        [InlineData(false, "{\"contactPolicies\":false,\"bigQuery\":false,\"smartCampaigns\":false,\"smartCampaingsExtraCustomizations\":false,\"smartSubjectCampaigns\":false}")]
+        [InlineData(true, "{\"contactPolicies\":true,\"bigQuery\":true,\"smartCampaigns\":true,\"smartCampaingsExtraCustomizations\":true,\"smartSubjectCampaigns\":true,\"emailParameter\":true,\"siteTracking\":true,\"bmwCrmIntegration\":true}")]
+        [InlineData(false, "{\"contactPolicies\":false,\"bigQuery\":false,\"smartCampaigns\":false,\"smartCampaingsExtraCustomizations\":false,\"smartSubjectCampaigns\":false,\"emailParameter\":false,\"siteTracking\":false,\"bmwCrmIntegration\":false}")]
         public async Task GET_features_should_return_right_value_based_on_db_response(bool responseValue, string expectedResponse)
         {
             // Arrange
 
-            var dbResponse = new[] { new Features { ContactPolicies = responseValue, BigQuery = responseValue, SmartCampaigns = responseValue, SmartCampaingsExtraCustomizations = responseValue, SmartSubjectCampaigns = responseValue } };
+            var dbResponse = new[] {
+                new Features {
+                    ContactPolicies = responseValue,
+                    BigQuery = responseValue,
+                    SmartCampaigns = responseValue,
+                    SmartCampaingsExtraCustomizations = responseValue,
+                    SmartSubjectCampaigns = responseValue,
+                    EmailParameter = responseValue,
+                    BmwCrmIntegration = responseValue,
+                    SiteTracking = responseValue
+                }
+            };
 
             var mockConnection = new Mock<DbConnection>();
 

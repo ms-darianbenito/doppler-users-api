@@ -16,5 +16,11 @@ namespace Doppler.UsersApi.Model
         public bool SmartCampaingsExtraCustomizations { get; set; }
 
         public bool SmartSubjectCampaigns { get; set; }
+
+        public bool EmailParameter { get; set; }
+
+        public bool SiteTracking { get; set; }
+
+        public bool BmwCrmIntegration { get; set; }
     }
 }
