@@ -109,15 +109,18 @@ namespace Doppler.UsersApi.Test
         {
             // Arrange
 
-            var dbResponse = new[] { new Features { ContactPolicies = responseValue,
-                BigQuery = responseValue,
-                SmartCampaigns = responseValue,
-                SmartCampaingsExtraCustomizations = responseValue,
-                SmartSubjectCampaigns = responseValue,
-                EmailParameter = responseValue,
-                BmwCrmIntegration = responseValue,
-                SiteTracking = responseValue
-            } };
+            var dbResponse = new[] {
+                new Features {
+                    ContactPolicies = responseValue,
+                    BigQuery = responseValue,
+                    SmartCampaigns = responseValue,
+                    SmartCampaingsExtraCustomizations = responseValue,
+                    SmartSubjectCampaigns = responseValue,
+                    EmailParameter = responseValue,
+                    BmwCrmIntegration = responseValue,
+                    SiteTracking = responseValue
+                }
+            };
 
             var mockConnection = new Mock<DbConnection>();
 
