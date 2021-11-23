@@ -9,6 +9,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddScoped<IFeaturesRepository, FeaturesRepository>();
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IDatabaseConnectionFactory, DatabaseConnectionFactory>();
+            services.AddScoped<IIntegrationsRepository, IntegrationsRepository>();
             return services;
         }
     }
