@@ -21,10 +21,10 @@ namespace Doppler.UsersApi.Controllers
         }
 
         [Authorize(Policies.OWN_RESOURCE_OR_SUPERUSER)]
-        [HttpGet("/accounts/{accountName}/integrations")]
+        [HttpGet("/accounts/{accountName}/integrations/status")]
         public async Task<IActionResult> GetIntegrationsConnectionsByEmail(string accountName)
         {
-            var integrations = await _integrationsRepository.GetIntegrationsByUserAccount(accountName);
+            var integrations = await _integrationsRepository.GetIntegrationsStatusByUserAccount(accountName);
 
             if (integrations == null)
             {

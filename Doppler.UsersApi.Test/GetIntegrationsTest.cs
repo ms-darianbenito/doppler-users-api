@@ -71,7 +71,7 @@ namespace Doppler.UsersApi.Test
 
             var client = _factory.CreateClient(new WebApplicationFactoryClientOptions());
 
-            var request = new HttpRequestMessage(HttpMethod.Get, "accounts/test1@test.com/integrations")
+            var request = new HttpRequestMessage(HttpMethod.Get, "accounts/test1@test.com/integrations/status")
             {
                 Headers = { { "Authorization", $"Bearer {token}" } }
             };
@@ -91,7 +91,7 @@ namespace Doppler.UsersApi.Test
 
             var client = _factory.CreateClient(new WebApplicationFactoryClientOptions());
 
-            var request = new HttpRequestMessage(HttpMethod.Get, "accounts/test1@test.com/integrations");
+            var request = new HttpRequestMessage(HttpMethod.Get, "accounts/test1@test.com/integrations/status");
 
             // Act
             var response = await client.SendAsync(request);
