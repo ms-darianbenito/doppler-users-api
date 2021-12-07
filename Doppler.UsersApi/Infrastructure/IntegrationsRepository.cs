@@ -39,82 +39,92 @@ SELECT
         ELSE 'disconnected'
         END CustomDomainStatus
     ,CASE
-        WHEN integrations.[Tokko Broker] > 9
+        WHEN integrations.[Tokko Broker] > 2
             THEN 'alert'
         WHEN integrations.[Tokko Broker] IS NOT NULL
             THEN 'connected'
         ELSE 'disconnected'
         END TokkoStatus
     ,CASE
-        WHEN integrations.[TiendaNube] > 9
+        WHEN integrations.[TiendaNube] > 2
             THEN 'alert'
         WHEN integrations.[TiendaNube] IS NOT NULL
             THEN 'connected'
         ELSE 'disconnected'
         END TiendanubeStatus
     ,CASE
-        WHEN integrations.[Datahub] > 9
+        WHEN integrations.[Datahub] > 2
             THEN 'alert'
         WHEN integrations.[Datahub] IS NOT NULL
             THEN 'connected'
         ELSE 'disconnected'
         END DatahubStatus
     ,CASE
-        WHEN integrations.[VTEX] > 9
+        WHEN integrations.[VTEX] > 2
             THEN 'alert'
         WHEN integrations.[VTEX] IS NOT NULL
             THEN 'connected'
         ELSE 'disconnected'
         END VtexStatus
     ,CASE
-        WHEN integrations.[PrestaShop] > 9
+        WHEN integrations.[PrestaShop] > 2
             THEN 'alert'
         WHEN integrations.[PrestaShop] IS NOT NULL
             THEN 'connected'
         ELSE 'disconnected'
         END PrestashopStatus
     ,CASE
-        WHEN integrations.[Shopify] > 9
+        WHEN integrations.[Shopify] > 2
             THEN 'alert'
         WHEN integrations.[Shopify] IS NOT NULL
             THEN 'connected'
         ELSE 'disconnected'
         END ShopifyStatus
     ,CASE
-        WHEN integrations.[Magento] > 9
+        WHEN integrations.[Magento] > 2
             THEN 'alert'
         WHEN integrations.[Magento] IS NOT NULL
             THEN 'connected'
         ELSE 'disconnected'
         END MagentoStatus
     ,CASE
-        WHEN integrations.[Zoho] > 9
+        WHEN integrations.[Zoho] > 2
             THEN 'alert'
         WHEN integrations.[Zoho] IS NOT NULL
             THEN 'connected'
         ELSE 'disconnected'
         END ZohoStatus
     ,CASE
-        WHEN integrations.[WooCommerce] > 9
+        WHEN integrations.[WooCommerce] > 2
             THEN 'alert'
         WHEN integrations.[WooCommerce] IS NOT NULL
             THEN 'connected'
         ELSE 'disconnected'
         END WooCommerceStatus
     ,CASE
-        WHEN integrations.[Easycommerce] > 9
+        WHEN integrations.[Easycommerce] > 2
             THEN 'alert'
         WHEN integrations.[Easycommerce] IS NOT NULL
             THEN 'connected'
         ELSE 'disconnected'
         END EasycommerceStatus
     ,CASE
-        WHEN integrations.[BmwRspCrm] > 9
+        WHEN integrations.[BmwRspCrm] > 2
             THEN 'alert'
         WHEN integrations.[BmwRspCrm] IS NOT NULL
             THEN 'connected'
         ELSE 'disconnected'
         END BmwRspCrmStatus
+    ,CASE
+        WHEN u.EnableGoogleAnalytic = 1
+            THEN 'connected'
+        ELSE 'disconnected'
+        END GoogleAnaliyticStatus
+    ,CASE
+        WHEN BigQuery.AmountEmailsInbigQuery > 0
+            THEN 'connected'
+        ELSE 'disconnected'
+        END BigQueryStatus
 FROM dbo.[user] u
 LEFT JOIN (
     SELECT PVT.iduser
@@ -184,6 +194,12 @@ LEFT JOIN (
     FROM dbo.CustomDomain cd
     GROUP BY cd.IdUser
     ) CustomDomain ON CustomDomain.IdUser = u.IdUser
+LEFT JOIN (
+    SELECT COUNT(1) AmountEmailsInbigQuery
+        ,iduser
+    FROM datastudio.UserAccessByUser
+    GROUP BY iduser
+    ) BigQuery ON BigQuery.IdUser = u.IdUser
 WHERE u.Email = @Email",
                     new { Email = email });
                 return results.FirstOrDefault();
