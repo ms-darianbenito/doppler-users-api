@@ -32,5 +32,11 @@ namespace Doppler.UsersApi.Model
         public string EasycommerceStatus { get; set; }
 
         public string BmwRspCrmStatus { get; set; }
+
+        public string VtexStatus { get; set; }
+
+        public string GoogleAnaliyticStatus { get; set; }
+
+        public string BigQueryStatus { get; set; }
     }
 }
