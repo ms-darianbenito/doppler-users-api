@@ -3,6 +3,7 @@ using System.Data;
 using System.Linq;
 using Dapper;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace Doppler.UsersApi.Infrastructure
 {
@@ -13,196 +14,108 @@ namespace Doppler.UsersApi.Infrastructure
         {
             _connectionFactory = connectionFactory;
         }
-        public async Task<Integrations> GetIntegrationsStatusByUserAccount(string email)
+        public async Task<Dictionary<string, string>> GetIntegrationsStatusByUserAccount(string email)
         {
             using (IDbConnection connection = await _connectionFactory.GetConnection())
             {
-                var results = await connection.QueryAsync<Integrations>(@"
-SELECT
-    CASE
+                var results = await connection.QueryAsync<IntegrationStatus>(@"
+SELECT Name + 'Status' [Integration]
+    ,CASE StatusValues.[Status]
+        WHEN 1 THEN 'alert'
+        WHEN 0 THEN 'connected'
+        WHEN NULL THEN 'disconnected'
+    END [Status]
+FROM dbo.ThirdPartyApp tpa
+LEFT JOIN (
+    SELECT tpa.Name [Integration]
+        ,CASE
+            WHEN tpaxu.ConnectionErrors > 1
+                THEN 1
+            ELSE 0
+            END [Status]
+    FROM dbo.ThirdPartyAppXUser tpaxu
+    JOIN dbo.[user] u ON u.iduser = tpaxu.iduser
+    LEFT JOIN dbo.ThirdPartyApp tpa ON tpa.IdThirdPartyApp = tpaxu.IdThirdPartyApp
+    WHERE u.Email = @Email
+    ) StatusValues ON StatusValues.Integration = tpa.Name
+
+UNION
+
+SELECT 'DkimStatus' [Integration]
+    ,CASE
+        WHEN IdDomainSpfStatus = 3
+            OR IdDomainKeyStatus = 3
+            THEN 'alert'
+        WHEN IdDomainSpfStatus = 1
+            OR IdDomainKeyStatus = 1
+            THEN 'alert'
+        WHEN IdDomainSpfStatus = 2
+            AND IdDomainKeyStatus = 2
+            THEN 'connected'
+        WHEN IdDomainSpfStatus IS NULL
+            OR IdDomainKeyStatus IS NULL
+            THEN 'disconnected'
+        END [Status]
+FROM dbo.[User] u
+LEFT JOIN dbo.DomainInformationXUser dixu ON u.IdUser = dixu.IdUser
+WHERE u.Email = @Email
+
+UNION
+
+SELECT 'CustomDomainStatus' [Integration]
+    ,CASE
+        WHEN IdDomainVerificationStatus= 1
+            THEN 'alert'
+        WHEN IdDomainVerificationStatus=3
+            THEN 'alert'
+        WHEN IdDomainVerificationStatus=2
+            THEN 'connected'
+        WHEN IdDomainVerificationStatus IS NULL
+            THEN 'disconnected'
+        END [Status]
+FROM dbo.[User] u
+LEFT JOIN dbo.CustomDomain cd ON u.IdUser = cd.IdUser
+WHERE u.Email = @Email
+
+UNION
+
+SELECT 'BigQueryStatus' [Integration]
+    ,CASE
+        WHEN COUNT(1) > 0
+            THEN 'connected'
+        ELSE 'disconnected'
+        END [Status]
+FROM dbo.[User] u
+LEFT JOIN datastudio.UserAccessByUser ua ON u.IdUser = ua.IdUser
+WHERE u.Email = @Email
+GROUP BY u.iduser
+
+UNION
+
+SELECT 'ApiKeyStatus' [Integration]
+    ,CASE
         WHEN u.ApiKey IS NULL
             THEN 'disconnected'
         ELSE 'connected'
-        END ApiKeyStatus
-    ,CASE
-        WHEN dkim.AlertCounter > 0
-            THEN 'alert'
-        WHEN dkim.ConnectedCounter > 0
-            THEN 'connected'
-        ELSE 'disconnected'
-        END DkimStatus
-    ,CASE
-        WHEN CustomDomain.AlertCounter > 0
-            THEN 'alert'
-        WHEN CustomDomain.ConnectedCounter > 0
-            THEN 'connected'
-        ELSE 'disconnected'
-        END CustomDomainStatus
-    ,CASE
-        WHEN integrations.[Tokko Broker] > 2
-            THEN 'alert'
-        WHEN integrations.[Tokko Broker] IS NOT NULL
-            THEN 'connected'
-        ELSE 'disconnected'
-        END TokkoStatus
-    ,CASE
-        WHEN integrations.[TiendaNube] > 2
-            THEN 'alert'
-        WHEN integrations.[TiendaNube] IS NOT NULL
-            THEN 'connected'
-        ELSE 'disconnected'
-        END TiendanubeStatus
-    ,CASE
-        WHEN integrations.[Datahub] > 2
-            THEN 'alert'
-        WHEN integrations.[Datahub] IS NOT NULL
-            THEN 'connected'
-        ELSE 'disconnected'
-        END DatahubStatus
-    ,CASE
-        WHEN integrations.[VTEX] > 2
-            THEN 'alert'
-        WHEN integrations.[VTEX] IS NOT NULL
-            THEN 'connected'
-        ELSE 'disconnected'
-        END VtexStatus
-    ,CASE
-        WHEN integrations.[PrestaShop] > 2
-            THEN 'alert'
-        WHEN integrations.[PrestaShop] IS NOT NULL
-            THEN 'connected'
-        ELSE 'disconnected'
-        END PrestashopStatus
-    ,CASE
-        WHEN integrations.[Shopify] > 2
-            THEN 'alert'
-        WHEN integrations.[Shopify] IS NOT NULL
-            THEN 'connected'
-        ELSE 'disconnected'
-        END ShopifyStatus
-    ,CASE
-        WHEN integrations.[Magento] > 2
-            THEN 'alert'
-        WHEN integrations.[Magento] IS NOT NULL
-            THEN 'connected'
-        ELSE 'disconnected'
-        END MagentoStatus
-    ,CASE
-        WHEN integrations.[Zoho] > 2
-            THEN 'alert'
-        WHEN integrations.[Zoho] IS NOT NULL
-            THEN 'connected'
-        ELSE 'disconnected'
-        END ZohoStatus
-    ,CASE
-        WHEN integrations.[WooCommerce] > 2
-            THEN 'alert'
-        WHEN integrations.[WooCommerce] IS NOT NULL
-            THEN 'connected'
-        ELSE 'disconnected'
-        END WooCommerceStatus
-    ,CASE
-        WHEN integrations.[Easycommerce] > 2
-            THEN 'alert'
-        WHEN integrations.[Easycommerce] IS NOT NULL
-            THEN 'connected'
-        ELSE 'disconnected'
-        END EasycommerceStatus
-    ,CASE
-        WHEN integrations.[BmwRspCrm] > 2
-            THEN 'alert'
-        WHEN integrations.[BmwRspCrm] IS NOT NULL
-            THEN 'connected'
-        ELSE 'disconnected'
-        END BmwRspCrmStatus
+        END [Status]
+FROM dbo.[user] u
+WHERE u.Email = @Email
+
+UNION
+
+SELECT 'GoogleAnaliyticStatus' [Integration]
     ,CASE
         WHEN u.EnableGoogleAnalytic = 1
             THEN 'connected'
         ELSE 'disconnected'
-        END GoogleAnaliyticStatus
-    ,CASE
-        WHEN BigQuery.AmountEmailsInbigQuery > 0
-            THEN 'connected'
-        ELSE 'disconnected'
-        END BigQueryStatus
+        END [Status]
 FROM dbo.[user] u
-LEFT JOIN (
-    SELECT PVT.iduser
-        ,PVT.[2] [Tokko Broker]
-        ,PVT.[3] [TiendaNube]
-        ,PVT.[4] [Datahub]
-        ,PVT.[5] [VTEX]
-        ,PVT.[6] [PrestaShop]
-        ,PVT.[7] [Shopify]
-        ,PVT.[8] [Magento]
-        ,PVT.[9] [Zoho]
-        ,PVT.[10] [WooCommerce]
-        ,PVT.[11] [Easycommerce]
-        ,PVT.[12] [BmwRspCrm]
-    FROM (
-        SELECT tpaxu.IdUser
-            ,tpaxu.ConnectionErrors
-            ,tpaxu.IdThirdPartyApp
-        FROM dbo.ThirdPartyAppXUser tpaxu
-        JOIN dbo.[user] u ON u.iduser = tpaxu.iduser
-        WHERE u.Email = @Email
-        ) AS tabExpr
-    PIVOT(SUM(ConnectionErrors) FOR IdThirdPartyApp IN (
-                [2]
-                ,[3]
-                ,[4]
-                ,[5]
-                ,[6]
-                ,[7]
-                ,[8]
-                ,[9]
-                ,[10]
-                ,[11]
-                ,[12]
-                )) AS PVT
-    ) integrations ON integrations.iduser = u.iduser
-LEFT JOIN (
-    SELECT dixu.IdUser
-        ,COUNT(CASE
-                WHEN IdDomainSpfStatus = 3
-                    OR IdDomainKeyStatus = 3
-                    THEN 1
-                WHEN IdDomainSpfStatus = 1
-                    OR IdDomainKeyStatus = 1
-                    THEN 1
-                END) AlertCounter
-        ,COUNT(CASE
-                WHEN IdDomainSpfStatus = 2
-                    AND IdDomainKeyStatus = 2
-                    THEN 1
-                END) ConnectedCounter
-    FROM dbo.DomainInformationXUser dixu
-    GROUP BY dixu.IdUser
-    ) dkim ON dkim.IdUser = u.IdUser
-LEFT JOIN (
-    SELECT cd.IdUser
-        ,COUNT(CASE
-                WHEN IdDomainVerificationStatus = 1
-                    THEN 1
-                WHEN IdDomainVerificationStatus = 3
-                    THEN 1
-                END) alertCounter
-        ,COUNT(CASE
-                WHEN IdDomainVerificationStatus = 2
-                    THEN 1
-                END) ConnectedCounter
-    FROM dbo.CustomDomain cd
-    GROUP BY cd.IdUser
-    ) CustomDomain ON CustomDomain.IdUser = u.IdUser
-LEFT JOIN (
-    SELECT COUNT(1) AmountEmailsInbigQuery
-        ,iduser
-    FROM datastudio.UserAccessByUser
-    GROUP BY iduser
-    ) BigQuery ON BigQuery.IdUser = u.IdUser
 WHERE u.Email = @Email",
                     new { Email = email });
-                return results.FirstOrDefault();
+
+                return results.ToDictionary(
+                    key => key.Integration.Replace(" ", ""),
+                    Value => string.IsNullOrEmpty(Value.Status) ? "disconnected" : Value.Status);
             }
         }
     }
