@@ -37,7 +37,7 @@ namespace Doppler.UsersApi.Test
             var mockConnection = new Mock<DbConnection>();
 
             // TODO: validate input
-            mockConnection.SetupDapperAsync(c => c.QueryAsync<Integrations>(It.IsAny<string>(), It.IsAny<object>(), null, null, null)).ReturnsAsync(Enumerable.Empty<Integrations>());
+            mockConnection.SetupDapperAsync(c => c.QueryAsync<IntegrationStatus>(It.IsAny<string>(), It.IsAny<object>(), null, null, null)).ReturnsAsync(Enumerable.Empty<IntegrationStatus>());
 
             var client = _factory.WithWebHostBuilder(builder =>
             {
