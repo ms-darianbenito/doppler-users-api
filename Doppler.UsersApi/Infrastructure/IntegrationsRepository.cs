@@ -48,7 +48,7 @@ SELECT 'DkimStatus' [Integration]
         WHEN dkim.ConnectedCounter > 0
             THEN 'connected'
         ELSE 'disconnected'
-     END [Status]
+    END [Status]
 FROM (
 SELECT dixu.IdUser
     ,COUNT(CASE
