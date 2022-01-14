@@ -23,7 +23,7 @@ SELECT Name + 'Status' [Integration]
     ,CASE StatusValues.[Status]
         WHEN 1 THEN 'alert'
         WHEN 0 THEN 'connected'
-        WHEN NULL THEN 'disconnected'
+        ELSE 'disconnected'
     END [Status]
 FROM dbo.ThirdPartyApp tpa
 LEFT JOIN (
@@ -43,22 +43,32 @@ UNION
 
 SELECT 'DkimStatus' [Integration]
     ,CASE
-        WHEN IdDomainSpfStatus = 3
-            OR IdDomainKeyStatus = 3
+        WHEN dkim.AlertCounter > 0
             THEN 'alert'
-        WHEN IdDomainSpfStatus = 1
-            OR IdDomainKeyStatus = 1
-            THEN 'alert'
-        WHEN IdDomainSpfStatus = 2
-            AND IdDomainKeyStatus = 2
+        WHEN dkim.ConnectedCounter > 0
             THEN 'connected'
-        WHEN IdDomainSpfStatus IS NULL
-            OR IdDomainKeyStatus IS NULL
-            THEN 'disconnected'
-        END [Status]
+        ELSE 'disconnected'
+     END [Status]
+FROM (
+SELECT dixu.IdUser
+    ,COUNT(CASE
+            WHEN IdDomainSpfStatus = 3
+                OR IdDomainKeyStatus = 3
+                THEN 1
+            WHEN IdDomainSpfStatus = 1
+                OR IdDomainKeyStatus = 1
+                THEN 1
+            END) AlertCounter
+    ,COUNT(CASE
+            WHEN IdDomainSpfStatus = 2
+                AND IdDomainKeyStatus = 2
+                THEN 1
+            END) ConnectedCounter
 FROM dbo.[User] u
-LEFT JOIN dbo.DomainInformationXUser dixu ON u.IdUser = dixu.IdUser
-WHERE u.Email = @Email
+LEFT JOIN dbo.DomainInformationXUser dixu ON dixu.IdUser = u.IdUser
+WHERE u.Email = @email
+GROUP BY dixu.IdUser
+) dkim
 
 UNION
 
@@ -81,12 +91,16 @@ UNION
 
 SELECT 'BigQueryStatus' [Integration]
     ,CASE
-        WHEN COUNT(1) > 0
-            THEN 'connected'
+        WHEN
+            SUM(CASE
+                WHEN ua.email IS NOT NULL
+                    THEN 1
+                ELSE 0
+            END) > 0 THEN 'connected'
         ELSE 'disconnected'
-        END [Status]
+    END[Status]
 FROM dbo.[User] u
-LEFT JOIN datastudio.UserAccessByUser ua ON u.IdUser = ua.IdUser
+LEFT JOIN datastudio.UserAccessByUser ua ON u.IdUser = ua.IdUser AND ua.validTo > GETUTCDATE()
 WHERE u.Email = @Email
 GROUP BY u.iduser
 
