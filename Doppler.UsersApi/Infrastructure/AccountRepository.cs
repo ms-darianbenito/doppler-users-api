@@ -16,7 +16,7 @@ namespace Doppler.UsersApi.Infrastructure
         }
         public async Task<ContactInformation> GetContactInformation(string email)
         {
-            using var connection = await _connectionFactory.GetConnection();
+            using var connection = _connectionFactory.GetConnection();
             var result = await connection.QueryFirstOrDefaultAsync<ContactInformation>(@"
 SELECT
     U.FirstName,
@@ -49,7 +49,7 @@ WHERE
 
         public async Task UpdateContactInformation(string accountName, ContactInformation contactInformation)
         {
-            using var connection = await _connectionFactory.GetConnection();
+            using var connection = _connectionFactory.GetConnection();
             //Update User
             await connection.ExecuteAsync(@"
 UPDATE [User] SET
