@@ -17,7 +17,7 @@ namespace Doppler.UsersApi.Infrastructure
         }
         public async Task<Features> GetFeaturesByUserAccount(string email)
         {
-            using (IDbConnection connection = await _connectionFactory.GetConnection())
+            using (IDbConnection connection = _connectionFactory.GetConnection())
             {
                 var results = await connection.QueryAsync<Features>(@"
                     SELECT ISNULL(uf.[ShippingLimitEnabled], ISNULL(utp.[ShippingLimitEnabled], 0)) AS ContactPolicies,

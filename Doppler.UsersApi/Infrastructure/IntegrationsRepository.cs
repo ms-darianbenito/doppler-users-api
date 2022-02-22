@@ -16,7 +16,7 @@ namespace Doppler.UsersApi.Infrastructure
         }
         public async Task<Dictionary<string, string>> GetIntegrationsStatusByUserAccount(string email)
         {
-            using (IDbConnection connection = await _connectionFactory.GetConnection())
+            using (IDbConnection connection = _connectionFactory.GetConnection())
             {
                 var results = await connection.QueryAsync<IntegrationStatus>(@"
 SELECT Name + 'Status' [Integration]
